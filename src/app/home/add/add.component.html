@@ -1,0 +1,55 @@
+<ion-header [translucent]="false">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()" color="dark">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="dataManage()">
+        Done
+      </ion-button>
+    </ion-buttons>
+    <ion-title>
+      Add Appointment
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen="true">
+  <ion-row>
+    <ion-col size="12" sizeMd="4" sizeLg="3" sizeXl="2">
+      <img *ngIf="person.image!==''" [src]="dom.bypassSecurityTrustUrl(person.image)">
+      <ion-button (click)="capture()">sadfsd</ion-button>
+
+    </ion-col>
+    <ion-col size="12"></ion-col>
+    <ion-col size="12" sizeMd="4">
+      <ion-item>
+        <ion-label position="floating">Name</ion-label>
+        <ion-input [(ngModel)]="person.name"></ion-input>
+      </ion-item>
+
+    </ion-col>
+    <ion-col size="12" sizeMd="4">
+      <ion-item>
+        <ion-label position="floating">Address</ion-label>
+        <ion-input [(ngModel)]="person.address"></ion-input>
+      </ion-item>
+
+    </ion-col>
+    <ion-col size="12" sizeMd="4">
+      <ion-item>
+        <ion-label position="floating">Phone No</ion-label>
+        <ion-input type="number" [(ngModel)]="person.phone"></ion-input>
+      </ion-item>
+    </ion-col>
+    <ion-col size="12" >
+      <app-reasonlist [reasons]="searchItems" (reasonSelected)="reasonSelected($event)"></app-reasonlist>
+      <ion-item>
+        <ion-label position="floating">Reason For Visit</ion-label>
+        <ion-input (ionFocus)="focus(true)" (ionBlur)="focus(false)" [(ngModel)]="person.reason"
+          (ngModelChange)="searchReason()" type="text" autocomplete=""></ion-input>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+</ion-content>

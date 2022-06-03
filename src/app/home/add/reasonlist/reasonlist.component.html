@@ -1,0 +1,5 @@
+<div *ngIf="reasons.length>0" class="reasons">
+  <div class="single-reason" *ngFor="let reason of reasons" (click)="selected(reason)">
+    {{reason}}
+  </div>
+</div>
