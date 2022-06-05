@@ -7,7 +7,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button color="primary" (click)="shown=true">
+      <ion-button color="primary" [routerLink]="['/home/add']" routerLinkActive="router-link-active" >
         <ion-icon name="add"></ion-icon> Add
       </ion-button>
     </ion-buttons>

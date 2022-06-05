@@ -1,0 +1,6 @@
+{
+	"appId": "np.com.needtech.attendance",
+	"appName": "attendance",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

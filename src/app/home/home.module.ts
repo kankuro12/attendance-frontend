@@ -1,3 +1,4 @@
+import { ExtrapersonComponent } from './add/extraperson/extraperson.component';
 import { ReasonlistComponent } from './add/reasonlist/reasonlist.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -17,6 +18,6 @@ import { AddComponent } from './add/add.component';
     HomePageRoutingModule,
     HttpClientModule
   ],
-  declarations: [HomePage,AddComponent,ReasonlistComponent]
+  declarations: [HomePage,AddComponent,ReasonlistComponent,ExtrapersonComponent]
 })
 export class HomePageModule {}

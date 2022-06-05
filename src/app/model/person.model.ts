@@ -7,5 +7,6 @@ export class Person {
   code?='';
   used = false;
   image='';
-  others: Other[]=[];
+  imageType=1;
+  others='';
 }

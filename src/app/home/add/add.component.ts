@@ -1,10 +1,18 @@
+import { AppointmentDBService } from './../../services/appointmentdb.service';
+import { LocalImage } from './../../model/localImage.modal';
+import { ImagedbService } from './../../services/imagedb.service';
 import { browser } from 'protractor';
 import { Person } from './../../model/person.model';
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Camera, CameraResultType } from '@capacitor/camera';
-import { Platform } from '@ionic/angular';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { AlertController, Platform } from '@ionic/angular';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
+import { Other } from 'src/app/model/other.model';
+import { Capacitor } from '@capacitor/core';
+import { threadId } from 'worker_threads';
+import { Location } from '@angular/common';
+import { Route, Router } from '@angular/router';
 
 @Component({
   selector: 'app-add',
@@ -82,7 +90,15 @@ export class AddComponent implements OnInit {
     'Volvo'
   ];
   searchItems: string[] = [];
-  constructor(private platform: Platform, public dom: DomSanitizer,private client: HttpClient) { }
+  imageLoaded = false;
+  image = '';
+  constructor(private platform: Platform,
+    public dom: DomSanitizer,
+    private client: HttpClient,
+    private router: Router,
+    private imageDB: ImagedbService,
+    private appoitmentDB: AppointmentDBService,
+    private alertController: AlertController) { }
 
   ngOnInit() {
     const data = new Person();
@@ -90,8 +106,9 @@ export class AddComponent implements OnInit {
   }
 
   close() {
-    this.shown = false;
-    this.shownChange.emit(this.shown);
+    this.router.navigate(['/home']);
+    // this.shown = false;
+    // this.shownChange.emit(this.shown);
   }
 
   focus(focused: boolean) {
@@ -111,35 +128,113 @@ export class AddComponent implements OnInit {
     this.searchItems = [];
   }
 
-  async capture() {
-    const image = await Camera.getPhoto({
+  capture() {
+    Camera.getPhoto({
       quality: 90,
-      allowEditing: true,
-      resultType: CameraResultType.Uri
-    });
-    console.log(image);
+      height:300,
+      width:300,
+      allowEditing: false,
+      resultType: CameraResultType.Uri,
+      saveToGallery:false,
+      source:CameraSource.Camera,
 
-    this.person.image = image.webPath;
-    console.log(this.person);
+    }).then((image) => {
+      console.log(image);
+      this.image = image.webPath;
+      this.imageLoaded = true;
+    })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  clear() {
+    this.alertController.create({
+      header: 'Clear Data',
+      message: 'Do you want to clear data?',
+      buttons: [
+        {
+          text: 'OK',
+          cssClass: 'primary',
+          handler: (val: any) => {
+            this.person = new Person();
+          }
+        },
+        {
+          text: 'CANCEL',
+          cssClass: 'DANGER',
+        }
+      ]
+
+    })
+      .then((alert) => {
+        alert.present();
+      });
 
 
   }
 
-  async dataManage() {
 
-    const blob=await (await fetch(this.person.image)).blob();
-    const f=new FormData();
-    f.append('lorem',blob,'lorem.png');
-    for (const key in this.person) {
-      if (Object.prototype.hasOwnProperty.call(this.person, key) && key !== 'image') {
-        const value = this.person[key];
-          f.append(key,value);
-      }
-    }
-    this.client.post('http://localhost:8000',f)
-    .subscribe((res: any)=>{
-      console.log(res);
+
+  getBase64(blob: Blob) {
+    return new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onloadend = (e) => {
+        console.log(e);
+        resolve(e.target.result.toString());
+      };
+      r.onerror = e => {
+        reject('error while converting');
+      };
+      r.readAsDataURL(blob);
     });
+  }
+
+
+
+  async dataManage() {
+    let error = '';
+    if (!this.imageLoaded) {
+
+      error += 'Please select a image.<br>';
+    }
+    if (this.person.name === '') {
+      error += 'Please enter visitor name.<br>';
+
+    }
+    if (this.person.phone === '') {
+      error += 'Please enter visitor phone.<br>';
+
+    }
+    if (error !== '') {
+      this.alertController.create({
+        header: 'Add Appointment',
+        message: error,
+        buttons: ['ok']
+      }).then((alert) => {
+        alert.present();
+      });
+      return;
+    }
+    const blob = await (await fetch(this.image)).blob();
+    const base64 = await this.getBase64(blob);
+    if (this.imageDB.busy || !this.imageDB.open) {
+      alert('database loading, Please try again');
+      return;
+    }
+    const savedImage: any = await this.imageDB.insert(base64);
+    console.log(savedImage);
+
+    if (this.appoitmentDB.busy || !this.appoitmentDB.open) {
+      alert('database loading, Please try again');
+      this.imageDB.delete(savedImage.id);
+      return;
+    }
+    this.person.image = savedImage.id.toString();
+    this.person.imageType = 1;
+    this.appoitmentDB.insert(this.person);
+    this.imageLoaded = false;
+    this.image = '';
+
   }
 
 }

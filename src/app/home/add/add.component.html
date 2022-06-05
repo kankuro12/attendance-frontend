@@ -4,10 +4,14 @@
       <ion-button (click)="close()" color="dark">
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
+      <!-- <ion-back-button></ion-back-button> -->
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button color="primary" (click)="dataManage()">
         Done
+      </ion-button>
+      <ion-button color="danger" (click)="clear()">
+        Clear
       </ion-button>
     </ion-buttons>
     <ion-title>
@@ -15,11 +19,17 @@
     </ion-title>
   </ion-toolbar>
 </ion-header>
-<ion-content fullscreen="true">
+<ion-content [fullscreen]="true">
   <ion-row>
-    <ion-col size="12" sizeMd="4" sizeLg="3" sizeXl="2">
-      <img *ngIf="person.image!==''" [src]="dom.bypassSecurityTrustUrl(person.image)">
-      <ion-button (click)="capture()">sadfsd</ion-button>
+    <ion-col offset="2" offsetMd="0" size="8" sizeMd="4" sizeLg="3" sizeXl="2">
+      <div style="padding: 10px 0px;">
+        <div style="box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;">
+          <img style="display: block;"  *ngIf="imageLoaded" (click)="capture()" [src]="dom.bypassSecurityTrustUrl(image)">
+          <div expand="block" style="background-color: #cfcfcf;" *ngIf="!imageLoaded" (click)="capture()">
+            <img src="/assets/browse_image.png" alt="">
+          </div>
+        </div>
+      </div>
 
     </ion-col>
     <ion-col size="12"></ion-col>
@@ -43,7 +53,7 @@
         <ion-input type="number" [(ngModel)]="person.phone"></ion-input>
       </ion-item>
     </ion-col>
-    <ion-col size="12" >
+    <ion-col size="12" sizeMd="9" >
       <app-reasonlist [reasons]="searchItems" (reasonSelected)="reasonSelected($event)"></app-reasonlist>
       <ion-item>
         <ion-label position="floating">Reason For Visit</ion-label>
@@ -51,5 +61,20 @@
           (ngModelChange)="searchReason()" type="text" autocomplete=""></ion-input>
       </ion-item>
     </ion-col>
+    <ion-col size="12" sizeMd="3" >
+      <ion-item>
+        <ion-label position="floating">Code</ion-label>
+        <ion-input [(ngModel)]="person.code" type="text"></ion-input>
+      </ion-item>
+    </ion-col>
+
+    <ion-col size="12">
+      <ion-item>
+        <ion-label position="floating">Other Visitors</ion-label>
+        <ion-textarea [(ngModel)]="person.others"></ion-textarea>
+      </ion-item>
+    </ion-col>
   </ion-row>
+
+
 </ion-content>
