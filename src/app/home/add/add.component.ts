@@ -15,6 +15,7 @@ import { Capacitor } from '@capacitor/core';
 import { threadId } from 'worker_threads';
 import { Location } from '@angular/common';
 import { Route, Router } from '@angular/router';
+import { ReasonService } from 'src/app/services/reason.service';
 
 @Component({
   selector: 'app-add',
@@ -25,77 +26,13 @@ export class AddComponent implements OnInit {
   @Input() shown = false;
   @Output() shownChange = new EventEmitter<boolean>();
   person = new Person();
-  allDatas = [
-    'Abarth',
-    'Alfa Romeo',
-    'Aston Martin',
-    'Audi',
-    'Bentley',
-    'BMW',
-    'Bugatti',
-    'Cadillac',
-    'Chevrolet',
-    'Chrysler',
-    'Citroën',
-    'Dacia',
-    'Daewoo',
-    'Daihatsu',
-    'Dodge',
-    'Donkervoort',
-    'DS',
-    'Ferrari',
-    'Fiat',
-    'Fisker',
-    'Ford',
-    'Honda',
-    'Hummer',
-    'Hyundai',
-    'Infiniti',
-    'Iveco',
-    'Jaguar',
-    'Jeep',
-    'Kia',
-    'KTM',
-    'Lada',
-    'Lamborghini',
-    'Lancia',
-    'Land Rover',
-    'Landwind',
-    'Lexus',
-    'Lotus',
-    'Maserati',
-    'Maybach',
-    'Mazda',
-    'McLaren',
-    'Mercedes-Benz',
-    'MG',
-    'Mini',
-    'Mitsubishi',
-    'Morgan',
-    'Nissan',
-    'Opel',
-    'Peugeot',
-    'Porsche',
-    'Renault',
-    'Rolls-Royce',
-    'Rover',
-    'Saab',
-    'Seat',
-    'Skoda',
-    'Smart',
-    'SsangYong',
-    'Subaru',
-    'Suzuki',
-    'Tesla',
-    'Toyota',
-    'Volkswagen',
-    'Volvo'
-  ];
+
   searchItems: string[] = [];
   imageLoaded = false;
   image = '';
   constructor(private platform: Platform,
     public dom: DomSanitizer,
+    public reasons: ReasonService,
     private client: HttpClient,
     private router: Router,
     private imageDB: ImagedbService,
@@ -117,13 +54,20 @@ export class AddComponent implements OnInit {
 
   focus(focused: boolean) {
     if (focused) {
-      this.searchItems = this.allDatas.filter((o: string) => o.toLowerCase().startsWith(this.person.reason.toLowerCase()));
+      this.searchReason();
     } else {
     }
   }
 
   searchReason() {
-    this.searchItems = this.allDatas.filter((o: string) => o.toLowerCase().startsWith(this.person.reason.toLowerCase()));
+    const localSearchItems = this.reasons.reasons.filter((o: string) => o.toLowerCase().startsWith(this.person.reason.toLowerCase()));
+    if(localSearchItems.length===1 ){
+      if(localSearchItems[0]===this.person.reason){
+        this.searchItems=[];
+        return;
+      }
+    }
+    this.searchItems=localSearchItems;
   }
   reasonSelected(val: any) {
     console.log(val);
@@ -247,6 +191,7 @@ export class AddComponent implements OnInit {
       this.homeService.refresh();
       this.image = '';
       this.imageLoaded = false;
+      this.reasons.check(this.person.reason);
       this.person = new Person();
       this.sync.addTrack(3,p.id);
       this.homeService.syncStart();

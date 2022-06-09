@@ -30,10 +30,9 @@ export class RescheduleTypeComponent implements OnInit {
       return;
 
     }
-    console.log(typeof this.date,this.date,this.date.slice(0,10));
 
 
-    this.selected.emit({type:this.type,num:this.num,date:this.date.slice(0,10)});
+    this.selected.emit({type:this.type,num:this.num,date: (this.date===undefined || this.date===null)?null:this.date.slice(0,10)});
   }
 
 }
