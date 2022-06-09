@@ -1,3 +1,5 @@
+import { RescheduleTypeComponent } from './reschedule-type/reschedule-type.component';
+import { SingleappointmentComponent } from './singleappointment/singleappointment.component';
 import { ExtrapersonComponent } from './add/extraperson/extraperson.component';
 import { ReasonlistComponent } from './add/reasonlist/reasonlist.component';
 import { NgModule } from '@angular/core';
@@ -18,6 +20,6 @@ import { AddComponent } from './add/add.component';
     HomePageRoutingModule,
     HttpClientModule
   ],
-  declarations: [HomePage,AddComponent,ReasonlistComponent,ExtrapersonComponent]
+  declarations: [HomePage,AddComponent,ReasonlistComponent,ExtrapersonComponent,SingleappointmentComponent,RescheduleTypeComponent]
 })
 export class HomePageModule {}

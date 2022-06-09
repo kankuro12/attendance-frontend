@@ -1,0 +1,36 @@
+.single-appointment{
+  padding:2.5px;
+  cursor: pointer;
+  .inner{
+    color: white;
+    border-radius: 3px;
+    background-color: #453281;
+    &.enter{
+      background-color:#F2A813 ;
+    }
+    &.leave{
+      background-color: #4FBE19;
+    }
+    padding: 10px;
+    .no{
+      color: white;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .name{
+      font-size: 16px;
+    }
+    .address{
+      font-size: 13px;
+    }
+    .phone{
+      font-size: 13px;
+    }
+  }
+}
+
+@media(max-width:425px){
+  .single-appointment{
+    padding:2.5px 2.5px 0px 2.5px ;
+  }
+}

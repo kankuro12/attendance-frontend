@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Modal Content</ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="primary" (click)="done()" >Done</ion-button>
+      <ion-button >Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true">
+
+  <div style="padding:10px;">
+    <ion-item>
+      <ion-label>Schedule Type</ion-label>
+      <ion-select [(ngModel)]="type" placeholder="Select Schedule Type">
+        <ion-select-option [value]="1">Today Last</ion-select-option>
+        <ion-select-option [value]="2">Today Between</ion-select-option>
+        <ion-select-option [value]="3">Another Day</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item *ngIf="type===2">
+      <ion-label position="floating"> New Assigned No </ion-label>
+      <ion-input type="number" [(ngModel)]="num"></ion-input>
+    </ion-item>
+    <ion-item *ngIf="type===3">
+      <ion-label>Pick a date</ion-label>
+  <ion-datetime
+    displayFormat="DD.MM.YYYY"
+    presentation="date"
+    [(ngModel)]="date"
+  ></ion-datetime>
+    </ion-item>
+
+
+
+  </div>
+</ion-content>

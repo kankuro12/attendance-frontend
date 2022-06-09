@@ -1,3 +1,5 @@
+import { SyncService } from './../../services/sync.service';
+import { HomeService } from './../../services/home.service';
 import { AppointmentDBService } from './../../services/appointmentdb.service';
 import { LocalImage } from './../../model/localImage.modal';
 import { ImagedbService } from './../../services/imagedb.service';
@@ -97,6 +99,8 @@ export class AddComponent implements OnInit {
     private client: HttpClient,
     private router: Router,
     private imageDB: ImagedbService,
+    private homeService: HomeService,
+    private sync: SyncService,
     private appoitmentDB: AppointmentDBService,
     private alertController: AlertController) { }
 
@@ -131,12 +135,12 @@ export class AddComponent implements OnInit {
   capture() {
     Camera.getPhoto({
       quality: 90,
-      height:300,
-      width:300,
+      height: 300,
+      width: 300,
       allowEditing: false,
       resultType: CameraResultType.Uri,
-      saveToGallery:false,
-      source:CameraSource.Camera,
+      saveToGallery: false,
+      source: CameraSource.Camera,
 
     }).then((image) => {
       console.log(image);
@@ -156,6 +160,8 @@ export class AddComponent implements OnInit {
           text: 'OK',
           cssClass: 'primary',
           handler: (val: any) => {
+            this.image = '';
+            this.imageLoaded = false;
             this.person = new Person();
           }
         },
@@ -231,10 +237,30 @@ export class AddComponent implements OnInit {
     }
     this.person.image = savedImage.id.toString();
     this.person.imageType = 1;
-    this.appoitmentDB.insert(this.person);
-    this.imageLoaded = false;
-    this.image = '';
+    this.person.date=this.homeService.date;
+    this.person.no=this.homeService.appointments.length>0? (Math.max(...this.homeService.appointments.map((o: any)=> o.no))+1):1;
+    console.log(this.person.no);
 
+    this.appoitmentDB.insert(this.person)
+    .then((p: any)=>{
+      this.homeService.appointments.push(p);
+      this.homeService.refresh();
+      this.image = '';
+      this.imageLoaded = false;
+      this.person = new Person();
+      this.sync.addTrack(3,p.id);
+      this.homeService.syncStart();
+      this.router.navigate(['/home']);
+    })
+    .catch((err)=>{
+      this.alertController.create({
+        header: 'Add Appointment',
+        message: 'Appointment Cannot be saved',
+        buttons: ['ok']
+      }).then((alert) => {
+        alert.present();
+      });
+    });
   }
 
 }

@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>sync</ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <p>
+    {{sync.added.length+sync.edited.length+sync.deleted.length}} Records Need Syncing
+  </p>
+  <div>
+    <ion-button color="primary" (click)="homeService.syncStart()">Start Sync</ion-button>
+  </div>
+</ion-content>

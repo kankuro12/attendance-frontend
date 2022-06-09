@@ -11,6 +11,10 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'sync',
+    loadChildren: () => import('./pages/sync/sync.module').then( m => m.SyncPageModule)
+  },
 
 
 ];

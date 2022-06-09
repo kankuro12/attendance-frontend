@@ -8,5 +8,12 @@ export class Person {
   used = false;
   image='';
   imageType=1;
+  synced=false;
   others='';
+  date= '';
+  entertime ='';
+  leavetime = '';
+  enter=false;
+  leave=false;
+  no = 1;
 }

@@ -1,15 +1,17 @@
 import { LocalImage } from '../model/localImage.modal';
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppointmentDBService {
+  @Output() initiated=new EventEmitter<IDBDatabase>();
   db: IDBDatabase;
   open=false;
   busy=false;
   dbname='appointment';
   storename='appointment-store';
+
   constructor() {
     const req = window.indexedDB.open(this.dbname, 1);
     req.onupgradeneeded =  (e: IDBVersionChangeEvent)  => {
@@ -20,14 +22,63 @@ export class AppointmentDBService {
       });
       imageStore.createIndex('name','name',{unique:false});
       imageStore.createIndex('phone','phone',{unique:false});
+      imageStore.createIndex('synced','synced',{unique:false});
+      imageStore.createIndex('date','date',{unique:false});
+      imageStore.createIndex('no','no',{unique:false});
     };
     req.onsuccess=(e)=>{
       this.db=req.result;
       this.open=true;
+      this.initiated.emit(this.db);
     };
   }
 
+  getByDate(date: string){
+    this.busy=true;
+    return new Promise((resolve,reject)=>{
+      const imageStoreIndex=this.db.transaction(this.storename,'readwrite').objectStore(this.storename).index('date');
+      const req=imageStoreIndex.getAll(date);
+      req.onsuccess=(e: any)=>{
+        this.busy=false;
+        resolve(req.result);
+      };
+      req.onerror=(e: any)=>{
+        this.busy=false;
+        reject(e);
+      };
+    });
+  }
+
+  appointmentAnother(){
+
+  }
+
+  getMaxDate(date): Promise<number>{
+    this.busy=true;
+    return new Promise((resolve,reject)=>{
+      const imageStoreIndex=this.db.transaction(this.storename,'readwrite').objectStore(this.storename).index('date');
+      const req=imageStoreIndex.getAll(date);
+      req.onsuccess=(e: any)=>{
+        this.busy=false;
+        let max=1;
+        const datas: any[]=req.result;
+        if(datas.length>0){
+          this.busy=false;
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          max=Math.max(...datas.map(o=>o.no));
+        }
+        resolve(max);
+      };
+      req.onerror=(e: any)=>{
+        this.busy=false;
+        reject(e);
+      };
+    });
+  }
+
   get(id: number){
+    console.log(id);
+
     this.busy=true;
     return new Promise((resolve,reject)=>{
       const imageStore=this.db.transaction(this.storename,'readwrite').objectStore(this.storename);
@@ -62,7 +113,7 @@ export class AppointmentDBService {
     this.busy=true;
     return new Promise((resolve,reject)=>{
       const imageStore=this.db.transaction(this.storename,'readwrite').objectStore(this.storename);
-      const req=imageStore.put(obj,obj.id);
+      const req=imageStore.put(obj);
       req.onsuccess=(e: any)=>{
         this.busy=false;
         resolve(req.result);
@@ -107,3 +158,5 @@ export class AppointmentDBService {
 
   }
 }
+
+
